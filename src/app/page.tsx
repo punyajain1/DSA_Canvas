@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo, useRef } from "react";
 import Papa from "papaparse";
-import { Search, Building2, ExternalLink, Check, Square, CheckSquare, X, List, Hash, HelpCircle, Layers, Info } from "lucide-react";
+import { Search, Building2, ExternalLink, Check, Square, CheckSquare, X, List, Hash, HelpCircle, Layers, Info, ChevronLeft, ChevronRight } from "lucide-react";
 
 export type Question = {
   Title: string;
@@ -24,6 +24,9 @@ export default function Home() {
   const [filterDone, setFilterDone] = useState<"ALL" | "DONE" | "TODO">("ALL");
   const [loading, setLoading] = useState(true);
   
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 50;
+
   // Custom dropdown state
   const [showCompanyDropdown, setShowCompanyDropdown] = useState(false);
   const companyDropdownRef = useRef<HTMLDivElement>(null);
@@ -140,10 +143,41 @@ export default function Home() {
     });
   }, [data, search, companySearch, filterDifficulty, filterDone, doneList]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, companySearch, filterDifficulty, filterDone]);
+
+  const totalPages = Math.ceil(filteredData.length / pageSize);
+  const paginatedData = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredData.slice(start, start + pageSize);
+  }, [filteredData, currentPage]);
+
   const totalCompleted = Object.values(doneList).filter(Boolean).length;
   const progressPercentage = data.length > 0 ? Math.round((totalCompleted / data.length) * 100) : 0;
 
+  const topCompanyTopics = useMemo(() => {
+    if (!companySearch || filteredData.length === 0) return [];
+    
+    const topicCounts: Record<string, number> = {};
+    filteredData.forEach(q => {
+      if (!q.Topics) return;
+      const topics = q.Topics.split(',');
+      topics.forEach(t => {
+        const trimmed = t.trim();
+        if (trimmed) {
+          topicCounts[trimmed] = (topicCounts[trimmed] || 0) + 1;
+        }
+      });
+    });
+
+    return Object.entries(topicCounts)
+      .sort((a, b) => b[1] - a[1])
+      .map(entry => entry[0]);
+  }, [filteredData, companySearch]);
+
   const easyCount = data.filter(q => q.Difficulty === "EASY").length;
+
   const mediumCount = data.filter(q => q.Difficulty === "MEDIUM").length;
   const hardCount = data.filter(q => q.Difficulty === "HARD").length;
 
@@ -313,6 +347,25 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Top Topics Section */}
+        {companySearch && topCompanyTopics.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2 pt-2 animate-in fade-in duration-300">
+            <span className="text-[12px] text-[#9B9A97] flex items-center tracking-wide mr-1">
+              <Layers className="w-3.5 h-3.5 mr-1.5" />
+              ALL TOPICS IN {companySearch.toUpperCase()}:
+            </span>
+            {topCompanyTopics.map(topic => (
+              <button 
+                key={topic}
+                onClick={() => setSearch(topic)}
+                className="px-2 py-1 bg-[#202020] border border-[#2f2f2f] hover:bg-[#2f2f2f] rounded-[4px] text-[12px] text-[#D4D4D4] transition-colors focus:outline-none"
+              >
+                {topic}
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* Data Table */}
         <section className="pb-24">
           {loading ? (
@@ -337,7 +390,7 @@ export default function Home() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#2F2F2F]">
-                    {filteredData.map((q, idx) => {
+                    {paginatedData.map((q, idx) => {
                       const isDone = !!doneList[q.Title];
                       return (
                         <tr 
@@ -402,10 +455,31 @@ export default function Home() {
               </div>
               
               {/* Footer text */}
-              <div className="border-t border-[#2f2f2f] p-2 bg-[#191919]">
+              <div className="border-t border-[#2f2f2f] p-2 bg-[#191919] flex items-center justify-between">
                 <p className="text-[12px] text-[#9B9A97] max-w-full tracking-wide">
                   COUNT <span className="font-mono text-[#D4D4D4]">{filteredData.length}</span>
                 </p>
+                {totalPages > 1 && (
+                  <div className="flex items-center gap-3">
+                    <button 
+                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      className="p-1 flex items-center justify-center rounded bg-[#202020] border border-[#2f2f2f] text-[#9B9A97] hover:text-[#D4D4D4] hover:bg-[#2f2f2f] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <span className="text-[12px] text-[#9B9A97] font-medium">
+                      Page <span className="text-[#D4D4D4]">{currentPage}</span> of <span className="text-[#D4D4D4]">{totalPages}</span>
+                    </span>
+                    <button 
+                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                      disabled={currentPage === totalPages}
+                      className="p-1 flex items-center justify-center rounded bg-[#202020] border border-[#2f2f2f] text-[#9B9A97] hover:text-[#D4D4D4] hover:bg-[#2f2f2f] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           )}
