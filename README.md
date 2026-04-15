@@ -22,19 +22,50 @@ A minimalist, fast, and fully local dashboard to track your Data Structures and 
 
 ## 🛠️ Tech Stack
 
-- **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
-- **Library**: [React 18](https://react.dev/)
-- **Language**: [TypeScript](https://www.typescriptlang.org/)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **Icons**: [Lucide React](https://lucide.dev/)
-- **CSV Parsing**: [PapaParse](https://www.papaparse.com/)
-- **Storage/Compression**: [LZ-String](https://pieroxy.net/blog/pages/lz-string/index.html)
-- **Markdown Rendering**: [React Markdown](https://github.com/remarkjs/react-markdown)
+![Next JS](https://img.shields.io/badge/Next-black?style=for-the-badge&logo=next.js&logoColor=white)
+![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
+![TypeScript](https://img.shields.io/badge/typescript-%230074c1.svg?style=for-the-badge&logo=typescript&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
-## 🚀 Getting Started
+- **Framework**: Next.js 14 (App Router)
+- **Library**: React 18
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Icons**: Lucide React
+- **CSV Parsing**: PapaParse
+- **Storage/Compression**: LZ-String
+- **Markdown Rendering**: React Markdown
 
-First, make sure you have Node.js installed on your machine. Clone the repository and install the dependencies:
+## 🏗️ Architecture Diagram
 
+```mermaid
+graph TD
+    User((User)) --> |Interacts with| UI[Next.js Application]
+    
+    subgraph Client-Side Browser
+        UI --> |Parses Questions| CSV(public/leetcode_master.csv)
+        UI --> |"Saves Progress, Lists, Settings"| LS[(localStorage)]
+        UI --> |Compresses/Decompresses| LZ(lz-string)
+    end
+    
+    UI <--> |Fetches AI Hints | OR[OpenRouter API]
+```
+
+## 🚀 Setup Instructions
+
+### Prerequisites
+- **Node.js**: v18 or newer
+- **Git**
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/your-username/dsa_fe.git
+cd dsa_fe
+```
+
+2. Install the dependencies:
 ```bash
 npm install
 # or
@@ -43,8 +74,7 @@ yarn install
 pnpm install
 ```
 
-Run the development server:
-
+3. Run the development server:
 ```bash
 npm run dev
 # or
