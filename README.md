@@ -4,6 +4,20 @@ A minimalist, fast, and fully local dashboard to track your Data Structures and 
 
 ## ✨ Features
 
+### 📸 Dashboard Preview
+
+![Dashboard](/dashboard.png)
+*Main tracking overview with filtering, company tags, and progress stats.*
+
+![Problem Details](/problem-details.png)
+*Detailed problem view with acceptance rates, custom lists, and direct links.*
+
+![AI Assistant](/ai-assistant.png)
+*Built-in AI hints via OpenRouter to help you when you're stuck without giving away the full answer.*
+
+![Settings](/settings.png)
+*Local configuration for OpenRouter API keys and models.*
+
 - **🎨 Notion-Inspired UI**: Beautiful dark mode aesthetic with custom scrollbars, typography, and layout mimicking Notion databases.
 - **📊 Real-time Statistics**: See your progress at a glance with completion counts broken down by Total, Easy, Medium, and Hard problems.
 - **🔍 Advanced Filtering & Search**:
